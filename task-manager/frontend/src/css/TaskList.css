@@ -1,0 +1,26 @@
+.task-list-carousel {
+  margin-top: 24px;
+  width: 600px;
+}
+
+.carousel-container {
+  overflow: hidden;
+  position: relative;
+}
+
+.track {
+  display: flex;
+  gap: 16px;
+  transition: transform 0.1s ease-out;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 40px;
+  color: #6c757d;
+  font-size: 18px;
+}
+
+.empty-state p {
+  margin: 0;
+}
