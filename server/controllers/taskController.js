@@ -7,8 +7,40 @@ import {
 } from "../store/tasksStore.js";
 
 export const getAllTasks = (req, res) => {
-  const tasks = getTasks();
-  res.json(tasks);
+  try {
+    // אם יש query parameters, השתמש ב-pagination
+    if (req.query.page || req.query.limit) {
+      const { page = 1, limit = 3 } = req.query;
+      const pageNum = parseInt(page);
+      const limitNum = parseInt(limit);
+
+      const allTasks = getTasks();
+      const startIndex = (pageNum - 1) * limitNum;
+      const endIndex = startIndex + limitNum;
+
+      const paginatedTasks = allTasks.slice(startIndex, endIndex);
+      const totalTasks = allTasks.length;
+      const totalPages = Math.ceil(totalTasks / limitNum);
+
+      res.json({
+        tasks: paginatedTasks,
+        pagination: {
+          currentPage: pageNum,
+          totalPages,
+          totalTasks,
+          hasNextPage: pageNum < totalPages,
+          hasPrevPage: pageNum > 1,
+        },
+      });
+    } else {
+      // אם אין query parameters, החזר את כל המשימות
+      const tasks = getTasks();
+      res.json({ tasks });
+    }
+  } catch (error) {
+    console.error("Error in getAllTasks:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
 };
 
 export const createTask = (req, res) => {
