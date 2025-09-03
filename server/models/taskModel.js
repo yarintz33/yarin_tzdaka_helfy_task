@@ -1,10 +1,10 @@
 const taskModel = {
-  id: number,
-  title: string,
-  description: string,
-  completed: boolean,
-  createdAt: Date,
-  priority: string,
+  id: 0,
+  title: "",
+  description: "",
+  completed: false,
+  createdAt: new Date(),
+  priority: "medium",
 };
 
 export default taskModel;
