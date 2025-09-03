@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import TaskItem from "./TaskItem.jsx";
-import "./TaskList.css";
+import "../css/TaskList.css";
 
 export default function TaskList({
   tasks,
@@ -8,9 +8,12 @@ export default function TaskList({
   onEdit,
   onDelete,
   filter,
+  onLoadMore,
+  pagination,
 }) {
   const trackRef = useRef(null);
   const [isHovered, setIsHovered] = useState(false);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
 
   const filtered = tasks.filter((t) => {
     if (filter === "done") return !!t.completed;
@@ -19,6 +22,17 @@ export default function TaskList({
   });
 
   const looped = [...filtered, ...filtered, ...filtered];
+
+  const handleLoadMore = async () => {
+    if (isLoadingMore || !pagination.hasNextPage) return;
+
+    setIsLoadingMore(true);
+    try {
+      await onLoadMore(pagination.currentPage + 1);
+    } finally {
+      setIsLoadingMore(false);
+    }
+  };
 
   useEffect(() => {
     // If no tasks, don't start the animation
@@ -37,6 +51,11 @@ export default function TaskList({
 
       if (!isHovered) {
         track.style.transform = `translateX(-${progress * 100}%)`;
+
+        // Check if we need to load more tasks when approaching the end
+        if (progress > 0.7 && pagination.hasNextPage && !isLoadingMore) {
+          handleLoadMore();
+        }
       }
 
       animationId = requestAnimationFrame(animate);
@@ -49,7 +68,7 @@ export default function TaskList({
         cancelAnimationFrame(animationId);
       }
     };
-  }, [filtered, isHovered]);
+  }, [filtered, isHovered, pagination.hasNextPage, isLoadingMore]);
 
   // If no tasks, show message
   if (filtered.length === 0) {
@@ -61,24 +80,40 @@ export default function TaskList({
   }
 
   return (
-    <div
-      className="task-list-carousel"
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-    >
-      <div className="carousel-container">
-        <div ref={trackRef} className="track">
-          {looped.map((task, idx) => (
-            <TaskItem
-              key={`${task.id}-${idx}`}
-              task={task}
-              onToggle={onToggle}
-              onEdit={onEdit}
-              onDelete={onDelete}
-            />
-          ))}
+    <div className="task-list-wrapper">
+      <div
+        className="task-list-carousel"
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+      >
+        <div className="carousel-container">
+          <div ref={trackRef} className="track">
+            {looped.map((task, idx) => (
+              <TaskItem
+                key={`${task.id}-${idx}`}
+                task={task}
+                onToggle={onToggle}
+                onEdit={onEdit}
+                onDelete={onDelete}
+              />
+            ))}
+          </div>
         </div>
       </div>
+
+      {pagination.hasNextPage && (
+        <div className="load-more-section">
+          <button
+            className="load-more-btn"
+            onClick={handleLoadMore}
+            disabled={isLoadingMore}
+          >
+            {isLoadingMore
+              ? "Loading..."
+              : `Load More (${pagination.totalTasks - tasks.length} remaining)`}
+          </button>
+        </div>
+      )}
     </div>
   );
 }

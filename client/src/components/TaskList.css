@@ -1,3 +1,10 @@
+.task-list-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
 .task-list-carousel {
   margin-top: 24px;
   width: 600px;
@@ -23,4 +30,40 @@
 
 .empty-state p {
   margin: 0;
+}
+
+.load-more-section {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.load-more-btn {
+  background: #007bff;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 14px;
+}
+
+.load-more-btn:hover:not(:disabled) {
+  background: #0056b3;
+  transform: translateY(-1px);
+}
+
+.load-more-btn:disabled {
+  background: #6c757d;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .task-list-carousel {
+    width: 100%;
+    max-width: 500px;
+  }
 }

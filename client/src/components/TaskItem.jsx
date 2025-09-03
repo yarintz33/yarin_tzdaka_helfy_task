@@ -1,5 +1,5 @@
 import { useState } from "react";
-import "./TaskItem.css";
+import "../css/TaskItem.css";
 
 export default function TaskItem({ task, onToggle, onEdit, onDelete }) {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
